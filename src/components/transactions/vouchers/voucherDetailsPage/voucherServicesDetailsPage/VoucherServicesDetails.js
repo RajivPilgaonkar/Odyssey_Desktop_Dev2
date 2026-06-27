@@ -521,7 +521,13 @@ function VoucherServiceDetails(props) {
 
     const defaultFormObject = getDefaultFormObject({compVar: compVar});
 
-    const servicesLookup = compVar.serviceLookup.filter(rec => rec.transfer !== compVar.sightseeing);
+    // rec.transfer comes back from SQL as 0/1, not a boolean, so cast both
+    // sides before comparing or the strict !== never excludes anything
+    const servicesLookup = compVar.serviceLookup.filter(rec => Boolean(rec.transfer) !== Boolean(compVar.sightseeing));
+
+    // the dropdown reads from dbLookup[0].dataSource, not from servicesLookup
+    // directly, so it must be kept in sync with the current toggle state
+    compVar.dbLookup[0].dataSource = servicesLookup;
 
     // *** CASE SENSITIVE override formData properties
     const clearServiceLookupValues = {services_id: null, description: ''};

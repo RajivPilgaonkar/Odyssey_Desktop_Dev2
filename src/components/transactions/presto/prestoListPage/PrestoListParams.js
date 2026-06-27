@@ -500,7 +500,7 @@ function PrestoListParams(props) {
     const displayExprs = ["text"];
     const valueExprs = ["type"];
     const values = [compVar.searchType];
-    const widths = ['100%'];
+    const widths = ['150'];
     const onSelectBoxChanges = [onSearchTypeValueChanged];
 
     const dataSource = dataSources[index];
@@ -545,12 +545,12 @@ function PrestoListParams(props) {
     const style = styles[index];
     
     return (
-      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%'}}>
+      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'/*, width: '100%'*/}}>
         <div style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', fontSize: 16, paddingRight: 5}}>
           {label}
         </div>
         <div style={{flex: 3, display: 'flex', alignItems: 'center', justifyContent: 'flex-start'}}>
-          <TextBox 
+          <TextBox
             value={value}
             width={width}
             onValueChanged={valueChange}

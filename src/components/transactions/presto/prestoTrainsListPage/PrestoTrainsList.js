@@ -7,6 +7,7 @@ import {Button} from 'devextreme-react/button';
 import {Popup} from 'devextreme-react/popup';
 import {getViewContainerHeights} from "../../../common/MasterGridHelpers";
 import { getSectorFromCities } from '../../../common/GetDescFromIds';
+import { MASTER_GRID_HEADER_HEIGHT, MASTER_GRID_ROW_HEIGHT, MASTER_GRID_PAGER_HEIGHT } from '../../../../config/paths';
 
 import '../../../common/MasterGrid.css'
 import '../../../common/ButtonsPanel.css'
@@ -256,7 +257,17 @@ function PrestoTrainsList(props) {
   const renderContent = () => {
 
     const heights = getViewContainerHeights(compVar);
-    const containerHeight = heights.containerHeight - 200;
+    const maxContainerHeight = heights.containerHeight - 200;
+
+    // size the grid container to the rows actually shown, instead of always
+    // stretching to maxContainerHeight, so the buttons sit right below the data
+    // mainData is only populated once getTrainListing resolves, so guard against
+    // the pre-fetch render where it is still undefined
+    const mainDataLength = (compVar.mainData !== undefined) ? compVar.mainData.length : 0;
+    const pagingVisible = (mainDataLength > compVar.defaultPageSize) ? true : false;
+    const numRows = Math.min(mainDataLength, compVar.defaultPageSize);
+    const fittedHeight = MASTER_GRID_HEADER_HEIGHT + (numRows * MASTER_GRID_ROW_HEIGHT) + (pagingVisible ? MASTER_GRID_PAGER_HEIGHT : 0);
+    const containerHeight = Math.min(fittedHeight, maxContainerHeight);
 
     const open = (props.open === undefined) ? true : props.open;
     

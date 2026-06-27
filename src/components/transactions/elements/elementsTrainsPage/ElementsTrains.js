@@ -704,6 +704,16 @@ function ElementsTrains(props) {
 
     const defaultFormObject = getDefaultFormObject({compVar: compVar});
 
+    // same pattern as PrestoTravel.js's createFormObject: filter once here and
+    // feed the SAME filtered array to both the dropdown's dataSource and the
+    // getLookupValues() call below, so the displayed station always matches
+    // an entry in the list the dropdown is actually bound to
+    const fromStationLookup = compVar.fromStationLookup.filter(rec => rec.cities_id === compVar.formData.From_Cities_id);
+    compVar.dbLookup[2].dataSource = fromStationLookup;
+
+    const toStationLookup = compVar.toStationLookup.filter(rec => rec.cities_id === compVar.formData.To_Cities_id);
+    compVar.dbLookup[3].dataSource = toStationLookup;
+
     // *** CASE SENSITIVE override formData properties
     const clearFromCityLookupValues = {cities_id: null, city: ''};
     const clearToCityLookupValues = {cities_id: null, city: ''};
@@ -713,19 +723,19 @@ function ElementsTrains(props) {
     const clearUserLookupValues = {AdmUsers_id: null, uid: ''};
 
     const initialFromCityLookupValues = getLookupValues (
-      clearFromCityLookupValues, compVar.fromCityLookup, 
+      clearFromCityLookupValues, compVar.fromCityLookup,
       ['cities_id','city'], compVar.formData.From_Cities_id);
 
     const initialToCityLookupValues = getLookupValues (
-      clearToCityLookupValues, compVar.toCityLookup, 
+      clearToCityLookupValues, compVar.toCityLookup,
       ['cities_id','city'], compVar.formData.To_Cities_id);
 
     const initialFromStationLookupValues = getLookupValues (
-      clearFromStationLookupValues, compVar.fromStationLookup, 
+      clearFromStationLookupValues, fromStationLookup,
       ['trainstations_id','station'], compVar.formData.From_TrainStations_id);
-  
+
     const initialToStationLookupValues = getLookupValues (
-      clearToStationLookupValues, compVar.toStationLookup, 
+      clearToStationLookupValues, toStationLookup,
       ['trainstations_id','station'], compVar.formData.To_TrainStations_id);
                   
     const initialCurrencyLookupValues = getLookupValues (

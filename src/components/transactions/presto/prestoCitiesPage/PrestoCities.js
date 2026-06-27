@@ -520,6 +520,7 @@ function PrestoCities(props) {
               quotations_id={props.quotations_id}
               numPax={props.numPax}
               formMode={0}
+              city={rec.City}
               timeIn={rec.TimeIn}
               timeOut={rec.TimeOut}
               onModifyTravel={onModifyTravel}
