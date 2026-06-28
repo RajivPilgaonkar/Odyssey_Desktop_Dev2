@@ -25,7 +25,7 @@ function DaysOfOperation(props) {
     ];
 
     compVar.days = compVar.days.map((rec) => {
-      return {...rec, selected: rec.dayBit & props.daysOfOperation }
+      return {...rec, selected: (rec.dayBit & props.daysOfOperation) !== 0 }
     })
     
     forceRender();

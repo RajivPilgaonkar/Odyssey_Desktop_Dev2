@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { dbGetRecord, dbGetRecordRaw, dbExecuteSp, setPrestoParamValues, dbPrestoReports, dbPrestoDocxReports } from '../../../../actions';
+import { dbGetRecord, dbGetRecordRaw, dbExecuteSp, setPrestoParamValues, dbPrestoReports, dbPrestoDocxReports, dbPrestoApiCall } from '../../../../actions';
 import { convert_DbDate_To_DMY, convert_DbDate_To_MDY, convertDMY_MDY, getFieldsArray, getLookupValues, saveEditedInsertedData, convertToMoment_fmt, checkNullErrors, containsWhitespace, dateDiff, isValidTime, beforeInsert, getNowDate, convertDMY_toDate, setDateTimeFormat, getFirstOfMonth, getLastOfMonth, convertMDY_toDate } from "../../../common/CommonTransactionFunctions";
 import { setFocusedRow, getDefaultDataObject, getViewContainerHeights, getDefaultFormObject, afterEdit, afterAdd} from "../../../common/MasterGridHelpers";
 import { getAgentByCategoryListing} from "../../../common/GetOrgListing";
@@ -183,6 +183,10 @@ function PrestoList(props) {
 
           {id: 21, type: 1, text: 'List of Services', reportName: 'ListOfServices', reportType: 'PDF', reportEndPoint: '/reports/presto/tourHotelsAgents'},
           {id: 22, type: 1, text: 'Hotels (Images)', reportName: 'HotelListing', reportType: 'PDF', reportEndPoint: '/reports/presto/hotelImages'},
+
+          {id: 30,  type: 3,  template: function() { return "<hr style='margin: unset, height: 5' />"; }, disabled: true },          
+          {id: 31, type: 4, text: 'Vamoos API', reportName: 'vamoosAPI', reportType: 'API', reportEndPoint: '/reports/presto/vamoosAPI'},
+
 
         ],
         buttonList: [
@@ -1286,10 +1290,15 @@ function PrestoList(props) {
   //**********************************************************/
   const onReportClick = async (e) => {
 
+console.log('onReportClick',e.itemData);    
+
     if (e.itemData.type === 1) {
       await createPdfReport(e.itemData);
     } else if (e.itemData.type === 2) {
       await createDocxReport(e.itemData);
+    } else if (e.itemData.type === 4) {
+      console.log('Making API Call');
+      await createApiCall(e.itemData);
     }
 
   }
@@ -1341,6 +1350,37 @@ function PrestoList(props) {
     const getReportStatus = await dbPrestoDocxReports({data: data});
     const errorMsg = getReportStatus.error;
 
+    if (getReportStatus.error !== undefined && getReportStatus.error !== null) {
+      compVar.errorMsg = errorMsg;
+    }
+
+    compVar.reportInProgress = false;
+    forceRender();  
+
+  }
+
+  //**********************************************************/
+  const createApiCall = async(reportObj) => {
+
+    compVar.reportInProgress = true;
+    forceRender();
+
+    const idx = compVar.mainData.findIndex(rec => rec.Quotations_id === compVar.focusedRowKey);
+
+    const reportName = reportObj.reportName + '_' + compVar.mainData[idx].TourCode + '.pdf';
+    const img = (reportObj.img === undefined) ? false : reportObj.img;
+
+    const quoPrint_id = await getQuoPrint(compVar.focusedRowKey);
+
+    const data = {reportType: reportObj.type, fileName: reportName, reportEndPoint: reportObj.reportEndPoint, reportSubType: reportObj.subType, 
+      quotations_id: compVar.focusedRowKey, quoPrint_id: quoPrint_id,
+      img: img};
+
+console.log('Passing Data', data);      
+
+    const getReportStatus = await dbPrestoApiCall({data: data});
+    const errorMsg = getReportStatus.error + '. Please check your network / XAMPP Server';
+    
     if (getReportStatus.error !== undefined && getReportStatus.error !== null) {
       compVar.errorMsg = errorMsg;
     }

@@ -384,6 +384,36 @@ export const dbPrestoDocxReports = async (dataObj) => {
 
 };
 
+// Presto Reports
+export const dbPrestoApiCall = async (dataObj) => {
+
+  console.log('dataObj',dataObj);
+
+  /*=== *** for production version, try using the axios baseURL as described above ===*/
+  try {
+    const res = await axios.post(dataObj.data.reportEndPoint, dataObj, {responseType: 'blob'});
+    console.log('resApi',res);
+
+    //if (res.data.success === undefined) {
+
+      // res could contain a pdf or a simple object ... pdf will be application/pdf
+      //if (res.data.type !== 'application/json') {
+        // This downloads the file into the Downloads folder
+        //downloadPdf (res.data, dataObj.data.fileName, dataObj.data.openReport);
+        //return {error: null, pdfBlob: res.data};
+      //} else {
+        //return {error: 'Error creating / getting Pdf file', pdfBlob: null};
+      //}
+    //} else {
+      //return {error: 'Error creating / getting Pdf file', pdfBlob: null};
+    //}
+  } catch (err) {
+    console.log("Error getting record:", err);
+    //return {error: 'Error creating / getting Pdf file', pdfBlob: null};
+  }
+
+};
+
 
 // VoucherReports
 export const sendMail = async (data) => {
